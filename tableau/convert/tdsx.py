@@ -11,6 +11,7 @@ from .writers import DataFrameCollection, CsvWriter, ExcelWriter
 class Tdsx:
     @staticmethod
     def to_dataframe(path: str) -> List[pd.DataFrame]:
+        if path == "": return 
         tdsx_file: FilePath = FilePath(path)
         tdsx_file.raise_if_not_exists()
         collection: DataFrameCollection = DataFrameCollection()
@@ -28,12 +29,14 @@ class Tdsx:
 
     @staticmethod
     def _collect_tables_from_hyper(collection: DataFrameCollection, hyper_path: str) -> None:
+        if hyper_path == "": return 
         hyper: HyperFile = HyperFile(hyper_path)
         for table in hyper.tables().all():
             collection.add(hyper.read_table(table))
 
     @staticmethod
     def to_csv(path: str, out_dir: Optional[str] = None, index: bool = False) -> List[FilePath]:
+        if path == "": return 
         tdsx_file: FilePath = FilePath(path)
         tdsx_file.raise_if_not_exists()
         output_dir: DirectoryPath = DirectoryPath(out_dir) if out_dir else tdsx_file.parent_directory()
@@ -44,6 +47,7 @@ class Tdsx:
 
     @staticmethod
     def to_excel(path: str, out_path: Optional[str] = None, engine: Optional[str] = None, index: bool = False) -> FilePath:
+        if path == "": return 
         tdsx_file: FilePath = FilePath(path)
         tdsx_file.raise_if_not_exists()
         output: FilePath = FilePath(out_path) if out_path else FilePath(f"{tdsx_file.as_string().replace('.tdsx', '')}__tables.xlsx")
