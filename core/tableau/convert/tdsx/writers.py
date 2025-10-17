@@ -20,12 +20,12 @@ class CsvWriter:
         self._output_directory: DirectoryPath = output_directory
         self._source_name: FileName = source_name
 
-    def write(self, dataframe: pd.DataFrame) -> FilePath:
+    def write(self, dataframe: pd.DataFrame, index:bool=False) -> FilePath:
         schema: str = dataframe.attrs.get("_schema", "unknown")
         table: str = dataframe.attrs.get("_table", "table")
         file_name: FileName = FileName(f"{self._source_name.as_string()}__{schema}.{table}.csv")
         destination: FilePath = self._output_directory.join(file_name.sanitized())
-        dataframe.to_csv(destination.as_string(), index=False)
+        dataframe.to_csv(destination.as_string(), index=index)
         return destination
 
 

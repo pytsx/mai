@@ -2,7 +2,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Union
 
-
 class FilePath:
     def __init__(self, value: Union[str, Path]) -> None:
         self._value: Path = Path(value)
@@ -21,6 +20,9 @@ class FilePath:
 
     def stem(self) -> FileName:
         return FileName(self._value.stem)
+
+    def suffix(self) -> FileSuffix:
+        return FileSuffix(self._value.suffix)
 
 
 class DirectoryPath:
@@ -60,3 +62,45 @@ class SheetName:
 
     def _handle_reserved(self, name: str) -> str:
         return f"_{name}" if name.strip().lower() in {"history"} else name
+
+
+
+class FileSuffix:
+    def __init__(self, value: str) -> None:
+        # Remove o ponto inicial se houver
+        self._value: str = value.lstrip(".")
+
+    def as_string(self) -> str:
+        """Retorna o sufixo sem o ponto"""
+        return self._value
+
+    def with_dot(self) -> str:
+        """Retorna o sufixo com o ponto"""
+        return f".{self._value}" if self._value else ""
+
+    def is_valid_for_tableau(self) -> bool:
+        """Verifica se é um sufixo válido para arquivos Tableau"""
+        tableau_formats: set[str] = {"twb", "twbx", "tds", "tdsx", "tde", "hyper"}
+        return self._value.lower() in tableau_formats
+
+    def is_archive(self) -> bool:
+        """Verifica se é um formato de arquivo compactado"""
+        archive_formats: set[str] = {"zip", "twbx", "tdsx", "tar", "gz", "7z"}
+        return self._value.lower() in archive_formats
+
+    def match(self, other: str) -> bool:
+        """Compara com outro sufixo (case insensitive)"""
+        return self._value.lower() == other.lstrip(".").lower()
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, FileSuffix):
+            return self._value.lower() == other._value.lower()
+        if isinstance(other, str):
+            return self.matches(other)
+        return False
+
+    def __str__(self) -> str:
+        return self.with_dot()
+
+    def __repr__(self) -> str:
+        return f"FileSuffix('{self._value}')"
